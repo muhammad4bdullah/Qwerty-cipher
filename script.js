@@ -24,7 +24,7 @@ const decodeMap = {};
 for(const k in encodeMap) decodeMap[encodeMap[k]] = k;
 
 // Random noise
-function randomNoise(){ return noiseSymbols[Math.floor(Math.random()*noiseSymbols.length)]; }
+function randomNoise(){ return noiseSymbols[Math.floor(Math.random()*noiseSymbols.length)]; } 
 
 // Block reverse
 function blockReverse(str, blockSize){

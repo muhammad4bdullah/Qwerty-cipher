@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cipher-Y19 Admin Panel</title>
+<link rel="stylesheet" href="admin.css">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<h1>Cipher-Y19 Admin Panel</h1>
+
+<div id="loginContainer">
+  <button id="adminLoginBtn">Login as Admin</button>
+</div>
+
+<div id="dashboard" style="display:none;">
+  <h2>Users & Logs</h2>
+  <div id="usersContainer"></div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

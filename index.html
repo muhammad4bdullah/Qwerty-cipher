@@ -3,153 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Qwerty Symbolic Code - Login</title>
+<title>Qwerty Symbolic Cipher v2</title>
 <style>
   body {
-    font-family: monospace;
-    background: #0f0f0f;
-    color: #00ff99;
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(120deg, #0b0f1a, #001a26);
+    color: #00ffcc;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
     margin: 0;
+    padding: 20px;
   }
-  h1 { margin-bottom: 15px; letter-spacing: 2px; }
-  .login-container, .main-container {
-    width: 80%;
-    max-width: 600px;
+  h1 {
+    margin-bottom: 15px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 8px #00ffcc, 0 0 20px #00ffaa;
+    font-size: 2rem;
+  }
+  .main-container {
+    width: 90%;
+    max-width: 700px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
-  .login-container { text-align:center; }
-  input {
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #00ffcc;
-    background: #0f0f0f;
-    color: #00ff99;
-    font-size: 16px;
+  textarea {
+    background:#001a26;
+    color:#00ffaa;
+    border:2px solid #00ffcc;
+    border-radius:8px;
+    padding:12px;
+    font-size:16px;
+    resize:vertical;
+    min-height:100px;
+    box-shadow: 0 0 12px #00ffcc;
+  }
+  .buttons {
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  pre {
+    background:#001a26;
+    border-radius:8px;
+    padding:15px;
+    border:2px solid #00ffcc;
+    min-height:80px;
+    overflow-x:auto;
+    box-shadow: 0 0 12px #00ffcc;
+  }
+  .copy-msg {
     text-align:center;
+    font-size:14px;
+    color:#00ffaa;
+    opacity:0;
+    transition:opacity 0.3s ease;
   }
-  button {
-    padding: 10px;
-    border-radius: 5px;
-    border: none;
-    background: #00ffcc;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  button:hover { background:#00ffaa; transform: scale(1.05);}
-  .error { color:#ff4444; font-size:14px; height:18px; }
-  textarea { background:#1a1a1a; color:#00ffcc; border:1px solid #00ffcc; border-radius:6px; padding:10px; font-size:16px; resize:vertical; min-height:80px; }
-  .buttons { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-  pre { background:#1a1a1a; border-radius:6px; padding:12px; border:1px solid #00ffcc; min-height:60px; overflow-x:auto; }
-  .copy-msg { text-align:center; font-size:14px; color:#00ffaa; opacity:0; transition:opacity 0.3s ease; }
   .copy-msg.show { opacity:1; }
+  button {
+    padding:12px 16px;
+    border-radius:6px;
+    border:none;
+    background: #00ffcc;
+    color:#001a26;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+    text-shadow: 0 0 4px #000;
+  }
+  button:hover {
+    background:#00ffaa;
+    transform:scale(1.07);
+  }
 </style>
 </head>
 <body>
-
-<h1>🔐 Qwerty Symbolic Code</h1>
-
-<!-- LOGIN SCREEN -->
-<div class="login-container" id="loginScreen">
-  <input type="password" id="password" placeholder="Enter password">
-  <button id="loginBtn">Login</button>
-  <div class="error" id="errorMsg"></div>
-</div>
-
-<!-- MAIN PAGE (HIDDEN UNTIL LOGIN) -->
-<div class="main-container" id="mainScreen" style="display:none;">
-  <label for="input">Input Text:</label>
-  <textarea id="input" placeholder="Type something..."></textarea>
-
+<h1>Qwerty Symbolic Cipher v2</h1>
+<div class="main-container">
+  <label>Input Text:</label>
+  <textarea id="input"></textarea>
   <div class="buttons">
     <button id="encodeBtn">Encode</button>
     <button id="decodeBtn">Decode</button>
     <button id="clearBtn">Clear</button>
+    <button id="pasteBtn">Paste Input</button>
     <button id="copyBtn">Copy Output</button>
   </div>
-
   <label>Output:</label>
   <pre id="output"></pre>
-  <div id="copyMsg" class="copy-msg">✅ Copied!</div>
+  <div id="copyMsg" class="copy-msg">Copied!</div>
 </div>
-
 <script>
-  // 🔐 LOGIN LOGIC
-  const PASSWORD = "#3'435qwe"; // set your password
-  const loginBtn = document.getElementById('loginBtn');
-  const passwordInput = document.getElementById('password');
-  const errorMsg = document.getElementById('errorMsg');
-  const loginScreen = document.getElementById('loginScreen');
-  const mainScreen = document.getElementById('mainScreen');
+const input = document.getElementById('input');
+const output = document.getElementById('output');
+const encodeBtn = document.getElementById('encodeBtn');
+const decodeBtn = document.getElementById('decodeBtn');
+const clearBtn = document.getElementById('clearBtn');
+const pasteBtn = document.getElementById('pasteBtn');
+const copyBtn = document.getElementById('copyBtn');
+const copyMsg = document.getElementById('copyMsg');
 
-  loginBtn.addEventListener('click', () => {
-    if(passwordInput.value === PASSWORD){
-      loginScreen.style.display = 'none';
-      mainScreen.style.display = 'flex';
-    } else {
-      errorMsg.textContent = "❌ Wrong password!";
-      passwordInput.value = '';
-    }
-  });
+// Noise symbols
+const noiseSymbols = ["§","¶","™","µ","Ω","∆","√","≈","‽","‡","‾","⁂","※","⁎","⟨","⟩","⦅","⦆","⟪","⫫","⊕","⊗","✧","✦","✩"];
 
-  passwordInput.addEventListener('keypress', (e) => {
-    if(e.key==='Enter') loginBtn.click();
-  });
+// Unified encode/decode map
+const encodeMap = {
+  '1':'Q','2':'W','3':'E','4':'R','5':'T','6':'Y','7':'U','8':'I','9':'O','0':'P',
+  'A':'@','S':'#','D':'$','F':'_','G':'&','H':'-','J':'+','K':'(','L':')',
+  'Z':'*','X':'"','C':'\'','V':':','B':';','N':'!','M':'?',
 
-  // 🔑 QWERTY SYMBOLIC CODE LOGIC
-  const letterMap = { Q:'1', W:'2', E:'3', R:'4', T:'5', Y:'6', U:'7', I:'8', O:'9', P:'0', A:'@', S:'#', D:'$', F:'_', G:'&', H:'-', J:'+', K:'(', L:')', Z:'*', X:'"', C:"'", V:':', B:';', N:'!', M:'?' };
-  const symbolToLetter = { '@':'a', '#':'s', '$':'d', '_':'f', '&':'g', '-':'h', '+':'j', '(':'k', ')':'l', '*':'z', '"':'x', "'":'c', ':':'v', ';':'b', '!':'n', '?':'m' };
-  const letterToSymbol = {}; for (const [k,v] of Object.entries(symbolToLetter)) letterToSymbol[v]=k;
-  const digitInverse = { '1':'Q','2':'W','3':'E','4':'R','5':'T','6':'Y','7':'U','8':'I','9':'O','0':'P' };
-  const reverseMap = {}; for(const [k,v] of Object.entries(letterMap)) reverseMap[v]=k;
+  '!':'N','@':'A','#':'S','$':'D','_':'F','&':'G','-':'H','+':'J','(':'K',')':'L',
+  '*':'Z','"':'X','\'':'C',':':'V',';':'B','?':'M'
+};
 
-  const input = document.getElementById('input');
-  const output = document.getElementById('output');
-  const encodeBtn = document.getElementById('encodeBtn');
-  const decodeBtn = document.getElementById('decodeBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const copyBtn = document.getElementById('copyBtn');
-  const copyMsg = document.getElementById('copyMsg');
+const decodeMap = {};
+for(const k in encodeMap) decodeMap[encodeMap[k]] = k;
 
-  function encode(text){
-    const encoded = text.split('').map(ch=>{
-      const up=ch.toUpperCase();
-      if(letterMap[up]) return letterMap[up];
-      if(digitInverse[ch]) return digitInverse[ch];
-      if(symbolToLetter[ch]) return symbolToLetter[ch];
-      return ch;
-    }).join('');
-    return encoded.split('').reverse().join('');
+// Random noise
+function randomNoise(){ return noiseSymbols[Math.floor(Math.random()*noiseSymbols.length)]; }
+
+// Block reverse
+function blockReverse(str, blockSize){
+  let res='';
+  for(let i=0;i<str.length;i+=blockSize){
+    const chunk = str.slice(i,i+blockSize).split('').reverse().join('');
+    res+=chunk;
   }
+  return res;
+}
 
-  function decode(text){
-    const reversed = text.split('').reverse().join('');
-    return reversed.split('').map(ch=>{
-      if(reverseMap[ch]) return reverseMap[ch];
-      if(digitInverse[ch]) return digitInverse[ch];
-      if(letterToSymbol[ch]) return letterToSymbol[ch];
-      return ch;
-    }).join('');
+// Encode function
+function encode(text){
+  text = text.replace(/ /g,'\\');
+  let mapped = text.split('').map(ch=>{
+    if(ch==='\\') return '\\';
+    if(encodeMap[ch]) return encodeMap[ch];
+    if(encodeMap[ch.toUpperCase()]) return encodeMap[ch.toUpperCase()];
+    return ch;
+  }).join('');
+
+  let noisy='';
+  for(const c of mapped){
+    noisy += c;
+    if(c!=='\\' && Math.random()<1) noisy += randomNoise();
   }
+  return blockReverse(noisy,7);
+}
 
-  encodeBtn.addEventListener('click', ()=>{ output.textContent = encode(input.value); });
-  decodeBtn.addEventListener('click', ()=>{ output.textContent = decode(input.value); });
-  clearBtn.addEventListener('click', ()=>{ input.value=''; output.textContent=''; });
-  copyBtn.addEventListener('click', async ()=>{
-    const text=output.textContent;
-    if(!text) return;
-    await navigator.clipboard.writeText(text);
-    copyMsg.classList.add('show');
-    setTimeout(()=>copyMsg.classList.remove('show'),1000);
-  });
+// Decode function
+function decode(text){
+  let reversed = blockReverse(text,7);
+  let cleaned = reversed.split('').filter(c=>!noiseSymbols.includes(c)).join('');
+  let decoded = cleaned.split('').map(c=>decodeMap[c]||c).join('');
+  return decoded.replace(/\\/g,' ');
+}
+
+// Button events
+encodeBtn.addEventListener('click',()=>{ output.textContent = encode(input.value); });
+decodeBtn.addEventListener('click',()=>{ output.textContent = decode(input.value); });
+clearBtn.addEventListener('click',()=>{ input.value=''; output.textContent=''; });
+copyBtn.addEventListener('click',async()=>{
+  const text=output.textContent;
+  if(!text) return;
+  await navigator.clipboard.writeText(text);
+  copyMsg.classList.add('show');
+  setTimeout(()=>copyMsg.classList.remove('show'),1000);
+});
+
+// Paste input button
+pasteBtn.addEventListener('click', async ()=>{
+  try{
+    const text = await navigator.clipboard.readText();
+    input.value = text;
+  }catch(e){
+    alert('Failed to read clipboard: ' + e);
+  }
+});
 </script>
 </body>
 </html>

@@ -9,23 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
       appId: "1:122648836940:web:a098c052f65f3eb305ade9"
   };
   
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
   
+  // Only this Gmail can access admin
   const adminEmails = ["m10abdullah09@gmail.com"];
   
+  // DOM Elements
   const loginBtn = document.getElementById('adminLoginBtn');
   const loginContainer = document.getElementById('loginContainer');
   const dashboard = document.getElementById('dashboard');
   const usersContainer = document.getElementById('usersContainer');
   
-  // Login
+  // Admin Login with Google
   loginBtn.addEventListener('click', async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     try {
       const result = await auth.signInWithPopup(provider);
       const user = result.user;
+      
       if (adminEmails.includes(user.email)) {
         alert("Admin access granted");
         loginContainer.style.display = 'none';
@@ -37,9 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch(e) {
       console.error("Login failed:", e);
+      alert("Login failed: " + e.message);
     }
   });
   
+  // Load users and logs in real-time
   function loadUsers() {
     db.collection('users').onSnapshot(snapshot => {
       usersContainer.innerHTML = '';
@@ -59,22 +65,26 @@ document.addEventListener('DOMContentLoaded', () => {
               <button class="action-btn" onclick="deleteLog('${userId}','${logDoc.id}')">Delete</button>
             </div>`;
           });
+  
           userCard.innerHTML = <strong>${user.nickname || userId}</strong> + logsHTML +
             <br><button class="action-btn" onclick="resetNickname('${userId}')">Reset Nickname</button>;
         });
+  
         usersContainer.appendChild(userCard);
       });
     });
   }
   
+  // Delete log
   window.deleteLog = (userId, logId) => {
-    if(confirm("Delete this log?")) {
+    if (confirm("Delete this log?")) {
       db.collection('users').doc(userId).collection('logs').doc(logId).delete();
     }
   };
   
+  // Reset nickname
   window.resetNickname = (userId) => {
-    if(confirm("Reset nickname for this user?")) {
+    if (confirm("Reset nickname for this user?")) {
       db.collection('users').doc(userId).update({nickname: ""});
     }
   };

@@ -1,188 +1,1071 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Qwerty Symbolic Cipher v2</title>
+
+<title>Qwerty Symbolic Cipher v3</title>
+
 <style>
+:root {
+  --bg: #05090d;
+  --panel: rgba(0, 20, 27, 0.78);
+  --panel2: rgba(0, 27, 35, 0.92);
+  --primary: #00ffcc;
+  --secondary: #00ffaa;
+  --text: #d8fff7;
+  --muted: #72aaa1;
+  --danger: #ff5577;
+  --border: rgba(0,255,204,.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Courier New", monospace;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0,255,204,.09), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(0,170,255,.08), transparent 30%),
+    linear-gradient(135deg, #020507, #00151c 50%, #020b10);
+  display: flex;
+  justify-content: center;
+  padding: 30px 16px;
+  overflow-x: hidden;
+}
+
+/* Animated cyber grid */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,255,204,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,204,.025) 1px, transparent 1px);
+  background-size: 35px 35px;
+  animation: gridMove 15s linear infinite;
+}
+
+@keyframes gridMove {
+  from { transform: translateY(0); }
+  to { transform: translateY(35px); }
+}
+
+.app {
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+
+.header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.logo {
+  font-size: 13px;
+  color: var(--secondary);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  opacity: .8;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 5vw, 2.7rem);
+  letter-spacing: 3px;
+  color: var(--primary);
+  text-shadow:
+    0 0 8px rgba(0,255,204,.8),
+    0 0 25px rgba(0,255,170,.35);
+}
+
+.subtitle {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Main panel */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  backdrop-filter: blur(15px);
+  box-shadow:
+    0 0 35px rgba(0,255,204,.08),
+    inset 0 0 30px rgba(0,255,204,.025);
+}
+
+/* Sections */
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 9px;
+}
+
+label {
+  color: var(--primary);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.counter {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Text areas */
+
+textarea,
+.output {
+  width: 100%;
+  min-height: 150px;
+  background: rgba(0, 12, 17, .9);
+  color: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+  font-family: "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  outline: none;
+  transition: .2s;
+}
+
+textarea {
+  resize: vertical;
+}
+
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow:
+    0 0 12px rgba(0,255,204,.18),
+    inset 0 0 12px rgba(0,255,204,.04);
+}
+
+.output {
+  min-height: 150px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+}
+
+textarea::placeholder {
+  color: #37645e;
+}
+
+/* Controls */
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+
+button {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 15px;
+  background: rgba(0,255,204,.08);
+  color: var(--primary);
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+button:hover {
+  background: rgba(0,255,204,.16);
+  border-color: var(--primary);
+  box-shadow: 0 0 14px rgba(0,255,204,.15);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+.primary {
+  background: var(--primary);
+  color: #00100d;
+  border-color: var(--primary);
+}
+
+.primary:hover {
+  background: var(--secondary);
+  color: #00100d;
+}
+
+.danger {
+  color: var(--danger);
+  border-color: rgba(255,85,119,.35);
+}
+
+.danger:hover {
+  background: rgba(255,85,119,.1);
+  border-color: var(--danger);
+}
+
+/* Settings */
+
+.settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.setting {
+  background: rgba(0,255,204,.035);
+  border: 1px solid rgba(0,255,204,.12);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.setting-title {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+/* Bottom toolbar */
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar button {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Status */
+
+.status {
+  margin-top: 15px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0,255,204,.035);
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+  border: 1px solid rgba(0,255,204,.08);
+}
+
+.status.active {
+  color: var(--secondary);
+}
+
+/* Footer */
+
+.footer {
+  text-align: center;
+  margin-top: 16px;
+  color: #315b55;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* Toast */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 25px;
+  transform: translate(-50%, 20px);
+  background: #001a20;
+  color: var(--primary);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 9px;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s;
+  z-index: 20;
+  box-shadow: 0 0 20px rgba(0,255,204,.15);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
   body {
-    font-family: 'Courier New', monospace;
-    background: linear-gradient(120deg, #0b0f1a, #001a26);
-    color: #00ffcc;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    padding: 20px;
+    padding: 15px 10px;
   }
-  h1 {
-    margin-bottom: 15px;
-    letter-spacing: 3px;
-    text-shadow: 0 0 8px #00ffcc, 0 0 20px #00ffaa;
-    font-size: 2rem;
+
+  .panel {
+    padding: 15px;
+    border-radius: 14px;
   }
-  .main-container {
-    width: 90%;
-    max-width: 700px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+
+  .controls,
+  .settings {
+    grid-template-columns: 1fr;
   }
-  textarea {
-    background:#001a26;
-    color:#00ffaa;
-    border:2px solid #00ffcc;
-    border-radius:8px;
-    padding:12px;
-    font-size:16px;
-    resize:vertical;
-    min-height:100px;
-    box-shadow: 0 0 12px #00ffcc;
+
+  textarea,
+  .output {
+    min-height: 130px;
   }
-  .buttons {
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  pre {
-    background:#001a26;
-    border-radius:8px;
-    padding:15px;
-    border:2px solid #00ffcc;
-    min-height:80px;
-    overflow-x:auto;
-    box-shadow: 0 0 12px #00ffcc;
-  }
-  .copy-msg {
-    text-align:center;
-    font-size:14px;
-    color:#00ffaa;
-    opacity:0;
-    transition:opacity 0.3s ease;
-  }
-  .copy-msg.show { opacity:1; }
-  button {
-    padding:12px 16px;
-    border-radius:6px;
-    border:none;
-    background: #00ffcc;
-    color:#001a26;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.2s;
-    text-shadow: 0 0 4px #000;
-  }
-  button:hover {
-    background:#00ffaa;
-    transform:scale(1.07);
-  }
+}
 </style>
 </head>
+
 <body>
-<h1>Qwerty Symbolic Cipher v2</h1>
-<div class="main-container">
-  <label>Input Text:</label>
-  <textarea id="input"></textarea>
-  <div class="buttons">
-    <button id="encodeBtn">Encode</button>
-    <button id="decodeBtn">Decode</button>
-    <button id="clearBtn">Clear</button>
-    <button id="pasteBtn">Paste Input</button>
-    <button id="copyBtn">Copy Output</button>
+
+<div class="app">
+
+  <header class="header">
+    <div class="logo">QWERTY // SYMBOLIC // ENCRYPTION</div>
+
+    <h1>QWERTY CIPHER</h1>
+
+    <div class="subtitle">
+      Symbolic text encoder & decoder
+    </div>
+  </header>
+
+  <main class="panel">
+
+    <!-- INPUT -->
+
+    <section class="section">
+
+      <div class="section-header">
+        <label for="input">INPUT</label>
+        <span class="counter" id="inputCounter">0 chars</span>
+      </div>
+
+      <textarea
+        id="input"
+        spellcheck="false"
+        placeholder="Enter text to encode or decode..."
+      ></textarea>
+
+    </section>
+
+    <!-- SETTINGS -->
+
+    <section class="settings">
+
+      <div class="setting">
+
+        <div class="setting-title">
+          <span>NOISE LEVEL</span>
+          <span id="noiseValue">100%</span>
+        </div>
+
+        <input
+          id="noiseLevel"
+          type="range"
+          min="0"
+          max="100"
+          value="100"
+        >
+
+      </div>
+
+      <div class="setting">
+
+        <div class="setting-title">
+          <span>BLOCK SIZE</span>
+          <span id="blockValue">7</span>
+        </div>
+
+        <input
+          id="blockSize"
+          type="range"
+          min="2"
+          max="15"
+          value="7"
+        >
+
+      </div>
+
+    </section>
+
+    <!-- MAIN ACTIONS -->
+
+    <div class="controls">
+
+      <button class="primary" id="encodeBtn">
+        ⚡ ENCODE
+      </button>
+
+      <button class="primary" id="decodeBtn">
+        🔓 DECODE
+      </button>
+
+      <button id="swapBtn">
+        ⇄ SWAP
+      </button>
+
+      <button class="danger" id="clearBtn">
+        ✕ CLEAR
+      </button>
+
+    </div>
+
+    <!-- OUTPUT -->
+
+    <section class="section">
+
+      <div class="section-header">
+        <label>OUTPUT</label>
+        <span class="counter" id="outputCounter">0 chars</span>
+      </div>
+
+      <div
+        class="output"
+        id="output"
+        tabindex="0"
+      ></div>
+
+    </section>
+
+    <!-- TOOLBAR -->
+
+    <div class="toolbar">
+
+      <button id="pasteBtn">
+        📋 PASTE
+      </button>
+
+      <button id="copyBtn">
+        ⧉ COPY
+      </button>
+
+      <button id="downloadBtn">
+        ↓ DOWNLOAD
+      </button>
+
+    </div>
+
+    <div class="status" id="status">
+      ● SYSTEM READY
+    </div>
+
+  </main>
+
+  <div class="footer">
+    QWERTY SYMBOLIC CIPHER v3 // CLIENT-SIDE
   </div>
-  <label>Output:</label>
-  <pre id="output"></pre>
-  <div id="copyMsg" class="copy-msg">Copied!</div>
+
 </div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-const input = document.getElementById('input');
-const output = document.getElementById('output');
-const encodeBtn = document.getElementById('encodeBtn');
-const decodeBtn = document.getElementById('decodeBtn');
-const clearBtn = document.getElementById('clearBtn');
-const pasteBtn = document.getElementById('pasteBtn');
-const copyBtn = document.getElementById('copyBtn');
-const copyMsg = document.getElementById('copyMsg');
+/* =========================================================
+   QWERTY SYMBOLIC CIPHER v3
+   ========================================================= */
 
-// Noise symbols
-const noiseSymbols = ["§","¶","™","µ","Ω","∆","√","≈","‽","‡","‾","⁂","※","⁎","⟨","⟩","⦅","⦆","⟪","⫫","⊕","⊗","✧","✦","✩"];
+const input = document.getElementById("input");
+const output = document.getElementById("output");
 
-// Unified encode/decode map
+const encodeBtn = document.getElementById("encodeBtn");
+const decodeBtn = document.getElementById("decodeBtn");
+const clearBtn = document.getElementById("clearBtn");
+const swapBtn = document.getElementById("swapBtn");
+
+const pasteBtn = document.getElementById("pasteBtn");
+const copyBtn = document.getElementById("copyBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+
+const inputCounter = document.getElementById("inputCounter");
+const outputCounter = document.getElementById("outputCounter");
+
+const noiseLevel = document.getElementById("noiseLevel");
+const blockSize = document.getElementById("blockSize");
+
+const noiseValue = document.getElementById("noiseValue");
+const blockValue = document.getElementById("blockValue");
+
+const status = document.getElementById("status");
+const toast = document.getElementById("toast");
+
+
+/* =========================================================
+   SYMBOL TABLE
+   ========================================================= */
+
+const noiseSymbols = [
+  "§","¶","™","µ","Ω",
+  "∆","√","≈","‽","‡",
+  "‾","⁂","⁎","⟨","⟩",
+  "⦅","⦆","⟪","⫫","⊕",
+  "⊗","✧","✦","✩"
+];
+
+
+/* =========================================================
+   ENCODE MAP
+   ========================================================= */
+
 const encodeMap = {
-  '1':'Q','2':'W','3':'E','4':'R','5':'T','6':'Y','7':'U','8':'I','9':'O','0':'P',
-  'A':'@','S':'#','D':'$','F':'_','G':'&','H':'-','J':'+','K':'(','L':')',
-  'Z':'*','X':'"','C':'\'','V':':','B':';','N':'!','M':'?',
 
-  '!':'N','@':'A','#':'S','$':'D','_':'F','&':'G','-':'H','+':'J','(':'K',')':'L',
-  '*':'Z','"':'X','\'':'C',':':'V',';':'B','?':'M'
+  "1":"Q",
+  "2":"W",
+  "3":"E",
+  "4":"R",
+  "5":"T",
+  "6":"Y",
+  "7":"U",
+  "8":"I",
+  "9":"O",
+  "0":"P",
+
+  "A":"@",
+  "S":"#",
+  "D":"$",
+  "F":"_",
+  "G":"&",
+  "H":"-",
+  "J":"+",
+  "K":"(",
+  "L":")",
+
+  "Z":"*",
+  "X":"\"",
+  "C":"'",
+  "V":":",
+  "B":";",
+  "N":"!",
+  "M":"?",
+
+  "!":"N",
+  "@":"A",
+  "#":"S",
+  "$":"D",
+  "_":"F",
+  "&":"G",
+  "-":"H",
+  "+":"J",
+  "(":"K",
+  ")":"L",
+  "*":"Z",
+  "\"":"X",
+  "'":"C",
+  ":":"V",
+  ";":"B",
+  "?":"M"
 };
 
+
+/* =========================================================
+   DECODE MAP
+   ========================================================= */
+
 const decodeMap = {};
-for(const k in encodeMap) decodeMap[encodeMap[k]] = k;
 
-// Random noise
-function randomNoise(){ return noiseSymbols[Math.floor(Math.random()*noiseSymbols.length)]; }
+for (const key in encodeMap) {
+  decodeMap[encodeMap[key]] = key;
+}
 
-// Block reverse
-function blockReverse(str, blockSize){
-  let res='';
-  for(let i=0;i<str.length;i+=blockSize){
-    const chunk = str.slice(i,i+blockSize).split('').reverse().join('');
-    res+=chunk;
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function randomNoise() {
+
+  return noiseSymbols[
+    Math.floor(Math.random() * noiseSymbols.length)
+  ];
+
+}
+
+
+function reverseBlocks(text, size) {
+
+  let result = "";
+
+  for (let i = 0; i < text.length; i += size) {
+
+    result += text
+      .slice(i, i + size)
+      .split("")
+      .reverse()
+      .join("");
+
   }
-  return res;
+
+  return result;
 }
 
-// Encode function
-function encode(text){
-  text = text.replace(/ /g,'\\');
-  let mapped = text.split('').map(ch=>{
-    if(ch==='\\') return '\\';
-    if(encodeMap[ch]) return encodeMap[ch];
-    if(encodeMap[ch.toUpperCase()]) return encodeMap[ch.toUpperCase()];
-    return ch;
-  }).join('');
 
-  let noisy='';
-  for(const c of mapped){
-    noisy += c;
-    if(c!=='\\' && Math.random()<1) noisy += randomNoise();
+function updateCounters() {
+
+  inputCounter.textContent =
+    `${input.value.length} chars`;
+
+  outputCounter.textContent =
+    `${output.textContent.length} chars`;
+
+}
+
+
+function showStatus(message) {
+
+  status.textContent = "● " + message;
+  status.classList.add("active");
+
+  setTimeout(() => {
+    status.classList.remove("active");
+  }, 1200);
+
+}
+
+
+function showToast(message) {
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1600);
+
+}
+
+
+/* =========================================================
+   ENCODE
+   ========================================================= */
+
+function encode(text) {
+
+  if (!text) return "";
+
+  const noiseChance =
+    Number(noiseLevel.value) / 100;
+
+  const size =
+    Number(blockSize.value);
+
+  // Preserve spaces using backslash.
+  text = text.replace(/ /g, "\\");
+
+  let mapped = "";
+
+  for (const char of text) {
+
+    if (char === "\\") {
+
+      mapped += "\\";
+
+      continue;
+
+    }
+
+    if (encodeMap[char]) {
+
+      mapped += encodeMap[char];
+
+      continue;
+
+    }
+
+    const upper = char.toUpperCase();
+
+    if (encodeMap[upper]) {
+
+      mapped += encodeMap[upper];
+
+      continue;
+
+    }
+
+    // Characters not supported by the cipher
+    // remain unchanged.
+    mapped += char;
+
   }
-  return blockReverse(noisy,7);
+
+
+  /* Add configurable noise */
+
+  let noisy = "";
+
+  for (const char of mapped) {
+
+    noisy += char;
+
+    if (
+      char !== "\\" &&
+      Math.random() < noiseChance
+    ) {
+
+      noisy += randomNoise();
+
+    }
+
+  }
+
+
+  /* Reverse in blocks */
+
+  return reverseBlocks(noisy, size);
+
 }
 
-// Decode function
-function decode(text){
-  let reversed = blockReverse(text,7);
-  let cleaned = reversed.split('').filter(c=>!noiseSymbols.includes(c)).join('');
-  let decoded = cleaned.split('').map(c=>decodeMap[c]||c).join('');
-  return decoded.replace(/\\/g,' ');
+
+/* =========================================================
+   DECODE
+   ========================================================= */
+
+function decode(text) {
+
+  if (!text) return "";
+
+  const size =
+    Number(blockSize.value);
+
+  // Undo block reversal.
+  const reversed =
+    reverseBlocks(text, size);
+
+
+  // Remove noise.
+  const cleaned =
+    [...reversed]
+      .filter(char =>
+        !noiseSymbols.includes(char)
+      )
+      .join("");
+
+
+  // Decode symbols.
+  const decoded =
+    [...cleaned]
+      .map(char =>
+        decodeMap[char] ?? char
+      )
+      .join("");
+
+
+  // Restore spaces.
+  return decoded.replace(/\\/g, " ");
+
 }
 
-// Button events
-encodeBtn.addEventListener('click',()=>{ output.textContent = encode(input.value); });
-decodeBtn.addEventListener('click',()=>{ output.textContent = decode(input.value); });
-clearBtn.addEventListener('click',()=>{ input.value=''; output.textContent=''; });
-copyBtn.addEventListener('click',async()=>{
-  const text=output.textContent;
-  if(!text) return;
-  await navigator.clipboard.writeText(text);
-  copyMsg.classList.add('show');
-  setTimeout(()=>copyMsg.classList.remove('show'),1000);
+
+/* =========================================================
+   OUTPUT
+   ========================================================= */
+
+function setOutput(text) {
+
+  output.textContent = text;
+
+  updateCounters();
+
+}
+
+
+/* =========================================================
+   BUTTON EVENTS
+   ========================================================= */
+
+encodeBtn.addEventListener("click", () => {
+
+  setOutput(
+    encode(input.value)
+  );
+
+  showStatus("ENCODE COMPLETE");
+
 });
 
-// Paste input button
-pasteBtn.addEventListener('click', async ()=>{
-  try{
-    const text = await navigator.clipboard.readText();
+
+decodeBtn.addEventListener("click", () => {
+
+  setOutput(
+    decode(input.value)
+  );
+
+  showStatus("DECODE COMPLETE");
+
+});
+
+
+clearBtn.addEventListener("click", () => {
+
+  input.value = "";
+
+  setOutput("");
+
+  input.focus();
+
+  showToast("Cleared");
+
+});
+
+
+swapBtn.addEventListener("click", () => {
+
+  const oldInput = input.value;
+
+  input.value = output.textContent;
+
+  setOutput(oldInput);
+
+  updateCounters();
+
+  showToast("Input and output swapped");
+
+});
+
+
+/* =========================================================
+   COPY
+   ========================================================= */
+
+copyBtn.addEventListener("click", async () => {
+
+  const text = output.textContent;
+
+  if (!text) {
+
+    showToast("Nothing to copy");
+
+    return;
+
+  }
+
+  try {
+
+    await navigator.clipboard.writeText(text);
+
+    showToast("Copied to clipboard");
+
+  } catch {
+
+    const temp =
+      document.createElement("textarea");
+
+    temp.value = text;
+
+    document.body.appendChild(temp);
+
+    temp.select();
+
+    document.execCommand("copy");
+
+    temp.remove();
+
+    showToast("Copied");
+
+  }
+
+});
+
+
+/* =========================================================
+   PASTE
+   ========================================================= */
+
+pasteBtn.addEventListener("click", async () => {
+
+  try {
+
+    const text =
+      await navigator.clipboard.readText();
+
     input.value = text;
-  }catch(e){
-    alert('Failed to read clipboard: ' + e);
+
+    updateCounters();
+
+    input.focus();
+
+    showToast("Pasted");
+
+  } catch {
+
+    showToast(
+      "Clipboard permission denied"
+    );
+
   }
+
 });
+
+
+/* =========================================================
+   DOWNLOAD
+   ========================================================= */
+
+downloadBtn.addEventListener("click", () => {
+
+  const text = output.textContent;
+
+  if (!text) {
+
+    showToast("Nothing to download");
+
+    return;
+
+  }
+
+  const blob =
+    new Blob(
+      [text],
+      { type: "text/plain" }
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const link =
+    document.createElement("a");
+
+  link.href = url;
+  link.download = "qwerty-cipher.txt";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  link.remove();
+
+  URL.revokeObjectURL(url);
+
+  showToast("File downloaded");
+
+});
+
+
+/* =========================================================
+   LIVE COUNTERS
+   ========================================================= */
+
+input.addEventListener(
+  "input",
+  updateCounters
+);
+
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+noiseLevel.addEventListener("input", () => {
+
+  noiseValue.textContent =
+    `${noiseLevel.value}%`;
+
+});
+
+
+blockSize.addEventListener("input", () => {
+
+  blockValue.textContent =
+    blockSize.value;
+
+});
+
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+   =========================================================
+
+   Ctrl + Enter = Encode
+   Ctrl + Shift + Enter = Decode
+   Escape = Clear
+   */
+
+input.addEventListener("keydown", event => {
+
+  if (
+    event.ctrlKey &&
+    event.key === "Enter"
+  ) {
+
+    event.preventDefault();
+
+    encodeBtn.click();
+
+  }
+
+  if (
+    event.ctrlKey &&
+    event.shiftKey &&
+    event.key === "Enter"
+  ) {
+
+    event.preventDefault();
+
+    decodeBtn.click();
+
+  }
+
+  if (event.key === "Escape") {
+
+    clearBtn.click();
+
+  }
+
+});
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+updateCounters();
+
+noiseValue.textContent =
+  `${noiseLevel.value}%`;
+
+blockValue.textContent =
+  blockSize.value;
+
 </script>
+
 </body>
 </html>
+```
